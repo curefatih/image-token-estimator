@@ -61,6 +61,8 @@ function App() {
             height: img.naturalHeight,
           };
           setImageDimensions(dimensions);
+          setManualWidth("");
+          setManualHeight("");
           const tokenService = new ImageTokenService();
           const result = tokenService.calculateTokens(
             dimensions,
