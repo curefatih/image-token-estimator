@@ -218,7 +218,7 @@ function App() {
                 <div className="text-lg sm:text-xl bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-sm">
                   <span className="font-normal">Estimated tokens: </span>
                   <span className="font-bold">
-                    {estimatedTokens.toLocaleString()}
+                    {Math.ceil(estimatedTokens).toLocaleString()}
                   </span>
                 </div>
                 <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
