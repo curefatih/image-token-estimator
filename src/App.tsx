@@ -59,14 +59,26 @@ function App() {
     if (selectedImage) {
       const img = new Image();
       img.onload = () => {
-        calculateTokensFromDimensions(img.naturalWidth, img.naturalHeight);
+        const tokenService = new ImageTokenService();
+        const result = tokenService.calculateTokens(
+          { width: img.naturalWidth, height: img.naturalHeight },
+          value,
+          selectedDetail
+        );
+        setEstimatedTokens(result.tokens);
       };
       img.src = selectedImage;
     } else if (manualWidth && manualHeight) {
       const width = parseInt(manualWidth);
       const height = parseInt(manualHeight);
       if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-        calculateTokensFromDimensions(width, height);
+        const tokenService = new ImageTokenService();
+        const result = tokenService.calculateTokens(
+          { width, height },
+          value,
+          selectedDetail
+        );
+        setEstimatedTokens(result.tokens);
       }
     }
   };
@@ -76,14 +88,26 @@ function App() {
     if (selectedImage) {
       const img = new Image();
       img.onload = () => {
-        calculateTokensFromDimensions(img.naturalWidth, img.naturalHeight);
+        const tokenService = new ImageTokenService();
+        const result = tokenService.calculateTokens(
+          { width: img.naturalWidth, height: img.naturalHeight },
+          selectedModel,
+          value
+        );
+        setEstimatedTokens(result.tokens);
       };
       img.src = selectedImage;
     } else if (manualWidth && manualHeight) {
       const width = parseInt(manualWidth);
       const height = parseInt(manualHeight);
       if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-        calculateTokensFromDimensions(width, height);
+        const tokenService = new ImageTokenService();
+        const result = tokenService.calculateTokens(
+          { width, height },
+          selectedModel,
+          value
+        );
+        setEstimatedTokens(result.tokens);
       }
     }
   };
