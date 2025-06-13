@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/openai-image-token-calculator/",
+  base: "/image-token-estimator/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

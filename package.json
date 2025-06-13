@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://fatihcure.github.io/openai-image-token-calculator",
+  "homepage": "https://curefatih.github.io/image-token-estimator",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
