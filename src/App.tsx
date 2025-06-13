@@ -143,46 +143,79 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6 md:p-8 overflow-hidden">
-      <div className="h-full max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-200 dark:border-gray-700">
-        <div className="h-full flex">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6 lg:p-8 overflow-hidden">
+      <div className="h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border-2 sm:border-4 border-gray-200 dark:border-gray-700">
+        <div className="h-full flex flex-col lg:flex-row">
           {/* Main content area with image preview */}
-          <div className="flex-1 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center gap-6">
-            <div className="w-full max-w-md mb-4">
-              <div className="flex gap-2 justify-center">
-                <button
-                  onClick={() => setInputMode("upload")}
-                  className={`px-4 py-2 rounded-lg ${
-                    inputMode === "upload"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  Upload Image
-                </button>
-                <button
-                  onClick={() => setInputMode("manual")}
-                  className={`px-4 py-2 rounded-lg ${
-                    inputMode === "manual"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  Manual Input
-                </button>
+          <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
+            <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
+              <div className="w-full max-w-md mb-2 sm:mb-4">
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={() => setInputMode("upload")}
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
+                      inputMode === "upload"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    Upload Image
+                  </button>
+                  <button
+                    onClick={() => setInputMode("manual")}
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
+                      inputMode === "manual"
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    Manual Input
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {inputMode === "upload" ? (
-              <div className="w-full h-[calc(100vh-16rem)] max-w-5xl border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
-                {selectedImage ? (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <img
-                      src={selectedImage}
-                      alt="Preview"
-                      className="max-w-full max-h-full object-contain rounded-xl"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+              {inputMode === "upload" ? (
+                <div className="w-full min-h-[300px] max-h-[calc(100vh-24rem)] sm:max-h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-16rem)] max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
+                  {selectedImage ? (
+                    <div className="w-full h-full flex items-center justify-center p-4">
+                      <img
+                        src={selectedImage}
+                        alt="Preview"
+                        className="max-w-full max-h-full object-contain rounded-xl"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className="cursor-pointer bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
+                          Change Image
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
                       <input
                         type="file"
                         accept="image/*"
@@ -192,93 +225,62 @@ function App() {
                       />
                       <label
                         htmlFor="image-upload"
-                        className="cursor-pointer bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                        className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="17 8 12 3 7 8" />
-                          <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        Change Image
+                        <div className="text-5xl mb-3">📁</div>
+                        <div className="text-lg">Click to upload an image</div>
+                        <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                          Supports JPG, PNG, GIF
+                        </div>
                       </label>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
-                    >
-                      <div className="text-5xl mb-3">📁</div>
-                      <div className="text-lg">Click to upload an image</div>
-                      <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                        Supports JPG, PNG, GIF
-                      </div>
-                    </label>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="w-full max-w-md space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Width (px)
-                    </label>
-                    <input
-                      type="number"
-                      value={manualWidth}
-                      onChange={(e) => setManualWidth(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                      placeholder="Enter width"
-                      min="1"
-                      step="1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Height (px)
-                    </label>
-                    <input
-                      type="number"
-                      value={manualHeight}
-                      onChange={(e) => setManualHeight(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                      placeholder="Enter height"
-                      min="1"
-                      step="1"
-                    />
+                  )}
+                </div>
+              ) : (
+                <div className="w-full max-w-md space-y-3 sm:space-y-4 px-2 sm:px-0">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
+                        Width (px)
+                      </label>
+                      <input
+                        type="number"
+                        value={manualWidth}
+                        onChange={(e) => setManualWidth(e.target.value)}
+                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        placeholder="Enter width"
+                        min="1"
+                        step="1"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
+                        Height (px)
+                      </label>
+                      <input
+                        type="number"
+                        value={manualHeight}
+                        onChange={(e) => setManualHeight(e.target.value)}
+                        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        placeholder="Enter height"
+                        min="1"
+                        step="1"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {estimatedTokens !== null && (
-              <div className="text-center space-y-2">
-                <div className="text-xl bg-gray-100 dark:bg-gray-900 px-6 py-3 rounded-xl shadow-sm">
+              <div className="w-full text-center space-y-2 px-2 sm:px-0 mt-auto">
+                <div className="text-lg sm:text-xl bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-sm">
                   <span className="font-normal">Estimated tokens: </span>
                   <span className="font-bold">
                     {estimatedTokens.toLocaleString()}
                   </span>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   Calculated for {selectedModel} with {selectedDetail} detail
                   level
                   {selectedImage && imageDimensions ? (
@@ -299,21 +301,21 @@ function App() {
           </div>
 
           {/* Right panel with options */}
-          <div className="w-80 sm:w-96 border-l-4 border-gray-200 dark:border-gray-700 p-4 sm:p-6 md:p-8 flex flex-col gap-8 bg-gray-50 dark:bg-gray-900/50">
+          <div className="w-full lg:w-80 xl:w-96 border-t-2 lg:border-t-0 lg:border-l-2 sm:border-t-4 sm:border-l-4 border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6 lg:gap-8 bg-gray-50 dark:bg-gray-900/50">
             <div>
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                 Options
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
                     Model
                   </label>
                   <Select
                     value={selectedModel}
                     onValueChange={handleModelChange}
                   >
-                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full">
+                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full text-sm sm:text-base">
                       <SelectValue placeholder="Select model" />
                     </SelectTrigger>
                     <SelectContent>
@@ -331,14 +333,14 @@ function App() {
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
                     Detail Level
                   </label>
                   <Select
                     value={selectedDetail}
                     onValueChange={handleDetailChange}
                   >
-                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full">
+                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full text-sm sm:text-base">
                       <SelectValue placeholder="Select detail level" />
                     </SelectTrigger>
                     <SelectContent>
