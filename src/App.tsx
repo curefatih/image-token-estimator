@@ -25,7 +25,7 @@ function App() {
           setSelectedImage(e.target?.result as string);
           const tokenService = new ImageTokenService();
           const result = tokenService.calculateTokens(
-            { width: img.width, height: img.height },
+            { width: img.naturalWidth, height: img.naturalHeight },
             selectedModel,
             selectedDetail
           );
@@ -44,7 +44,7 @@ function App() {
       img.onload = () => {
         const tokenService = new ImageTokenService();
         const result = tokenService.calculateTokens(
-          { width: img.width, height: img.height },
+          { width: img.naturalWidth, height: img.naturalHeight },
           value,
           selectedDetail
         );
@@ -61,7 +61,7 @@ function App() {
       img.onload = () => {
         const tokenService = new ImageTokenService();
         const result = tokenService.calculateTokens(
-          { width: img.width, height: img.height },
+          { width: img.naturalWidth, height: img.naturalHeight },
           selectedModel,
           value
         );
@@ -160,7 +160,7 @@ function App() {
                     value={selectedModel}
                     onValueChange={handleModelChange}
                   >
-                    <SelectTrigger className="bg-white dark:bg-gray-800">
+                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full">
                       <SelectValue placeholder="Select model" />
                     </SelectTrigger>
                     <SelectContent>
@@ -185,7 +185,7 @@ function App() {
                     value={selectedDetail}
                     onValueChange={handleDetailChange}
                   >
-                    <SelectTrigger className="bg-white dark:bg-gray-800">
+                    <SelectTrigger className="bg-white dark:bg-gray-800 w-full">
                       <SelectValue placeholder="Select detail level" />
                     </SelectTrigger>
                     <SelectContent>
