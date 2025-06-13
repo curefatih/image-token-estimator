@@ -56,7 +56,13 @@ function App() {
     const width = parseInt(manualWidth);
     const height = parseInt(manualHeight);
     if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-      calculateTokensFromDimensions(width, height);
+      const tokenService = new ImageTokenService();
+      const result = tokenService.calculateTokens(
+        { width, height },
+        selectedModel,
+        selectedDetail
+      );
+      setEstimatedTokens(result.tokens);
     } else {
       setEstimatedTokens(null);
     }
