@@ -51,6 +51,8 @@ export class ImageTokenService {
     multiplier: number
   ): TokenCalculationResult {
     const { width, height } = dimensions;
+
+    // Calculate initial number of patches
     const patchesX = Math.ceil(
       (width + ImageTokenService.PATCH_SIZE - 1) / ImageTokenService.PATCH_SIZE
     );
@@ -58,32 +60,52 @@ export class ImageTokenService {
       (height + ImageTokenService.PATCH_SIZE - 1) / ImageTokenService.PATCH_SIZE
     );
     let totalPatches = patchesX * patchesY;
-
     let scaledDimensions = { ...dimensions };
 
+    // If patches exceed max, scale down the image
     if (totalPatches > ImageTokenService.MAX_PATCHES) {
+      // Calculate shrink factor to fit within max patches
       const shrinkFactor = Math.sqrt(
         (ImageTokenService.MAX_PATCHES *
           Math.pow(ImageTokenService.PATCH_SIZE, 2)) /
           (width * height)
       );
 
-      scaledDimensions = {
-        width: Math.floor(width * shrinkFactor),
-        height: Math.floor(height * shrinkFactor),
-      };
+      // Apply initial scaling
+      let newWidth = Math.floor(width * shrinkFactor);
+      let newHeight = Math.floor(height * shrinkFactor);
 
-      const newPatchesX = Math.ceil(
-        (scaledDimensions.width + ImageTokenService.PATCH_SIZE - 1) /
+      // Calculate new patches after initial scaling
+      let newPatchesX = Math.ceil(
+        (newWidth + ImageTokenService.PATCH_SIZE - 1) /
           ImageTokenService.PATCH_SIZE
       );
-      const newPatchesY = Math.ceil(
-        (scaledDimensions.height + ImageTokenService.PATCH_SIZE - 1) /
+      let newPatchesY = Math.ceil(
+        (newHeight + ImageTokenService.PATCH_SIZE - 1) /
+          ImageTokenService.PATCH_SIZE
+      );
+
+      // Fine-tune scaling to ensure whole number of patches
+      const widthScale =
+        newPatchesX / (newWidth / ImageTokenService.PATCH_SIZE);
+      newWidth = Math.floor(newWidth * widthScale);
+      newHeight = Math.floor(newHeight * widthScale);
+
+      // Recalculate final patches
+      newPatchesX = Math.ceil(
+        (newWidth + ImageTokenService.PATCH_SIZE - 1) /
+          ImageTokenService.PATCH_SIZE
+      );
+      newPatchesY = Math.ceil(
+        (newHeight + ImageTokenService.PATCH_SIZE - 1) /
           ImageTokenService.PATCH_SIZE
       );
       totalPatches = newPatchesX * newPatchesY;
+
+      scaledDimensions = { width: newWidth, height: newHeight };
     }
 
+    // Apply multiplier to get final token count
     return {
       tokens:
         Math.min(totalPatches, ImageTokenService.MAX_PATCHES) * multiplier,
