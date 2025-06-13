@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -22,15 +22,32 @@ function App() {
     height: number;
   } | null>(null);
 
-  const calculateTokensFromDimensions = (width: number, height: number) => {
-    const tokenService = new ImageTokenService();
-    const result = tokenService.calculateTokens(
-      { width, height },
-      selectedModel,
-      selectedDetail
-    );
-    setEstimatedTokens(result.tokens);
-  };
+  useEffect(() => {
+    if (inputMode === "manual" && manualWidth && manualHeight) {
+      const width = Number(manualWidth);
+      const height = Number(manualHeight);
+      console.log("Raw input values:", { manualWidth, manualHeight });
+      console.log("Parsed values:", { width, height });
+      if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
+        console.log("Manual dimensions change:", {
+          width,
+          height,
+          model: selectedModel,
+          detail: selectedDetail,
+        });
+        const tokenService = new ImageTokenService();
+        const result = tokenService.calculateTokens(
+          { width, height },
+          selectedModel,
+          selectedDetail
+        );
+        console.log("Token calculation result:", result);
+        setEstimatedTokens(result.tokens);
+      } else {
+        setEstimatedTokens(null);
+      }
+    }
+  }, [manualWidth, manualHeight, selectedModel, selectedDetail, inputMode]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,11 +57,18 @@ function App() {
         const img = new Image();
         img.onload = () => {
           setSelectedImage(e.target?.result as string);
-          setImageDimensions({
+          const dimensions = {
             width: img.naturalWidth,
             height: img.naturalHeight,
-          });
-          calculateTokensFromDimensions(img.naturalWidth, img.naturalHeight);
+          };
+          setImageDimensions(dimensions);
+          const tokenService = new ImageTokenService();
+          const result = tokenService.calculateTokens(
+            dimensions,
+            selectedModel,
+            selectedDetail
+          );
+          setEstimatedTokens(result.tokens);
         };
         img.src = e.target?.result as string;
       };
@@ -52,39 +76,26 @@ function App() {
     }
   };
 
-  const handleManualDimensionsChange = () => {
-    const width = parseInt(manualWidth);
-    const height = parseInt(manualHeight);
-    if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
+  const handleModelChange = (value: ModelType) => {
+    console.log("Model change:", {
+      newModel: value,
+      currentDetail: selectedDetail,
+      manualWidth,
+      manualHeight,
+    });
+    setSelectedModel(value);
+    if (selectedImage && imageDimensions) {
       const tokenService = new ImageTokenService();
       const result = tokenService.calculateTokens(
-        { width, height },
-        selectedModel,
+        imageDimensions,
+        value,
         selectedDetail
       );
+      console.log("Token calculation result (image):", result);
       setEstimatedTokens(result.tokens);
-    } else {
-      setEstimatedTokens(null);
-    }
-  };
-
-  const handleModelChange = (value: ModelType) => {
-    setSelectedModel(value);
-    if (selectedImage) {
-      const img = new Image();
-      img.onload = () => {
-        const tokenService = new ImageTokenService();
-        const result = tokenService.calculateTokens(
-          { width: img.naturalWidth, height: img.naturalHeight },
-          value,
-          selectedDetail
-        );
-        setEstimatedTokens(result.tokens);
-      };
-      img.src = selectedImage;
     } else if (manualWidth && manualHeight) {
-      const width = parseInt(manualWidth);
-      const height = parseInt(manualHeight);
+      const width = Number(manualWidth);
+      const height = Number(manualHeight);
       if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
         const tokenService = new ImageTokenService();
         const result = tokenService.calculateTokens(
@@ -92,28 +103,32 @@ function App() {
           value,
           selectedDetail
         );
+        console.log("Token calculation result (manual):", result);
         setEstimatedTokens(result.tokens);
       }
     }
   };
 
   const handleDetailChange = (value: DetailLevel) => {
+    console.log("Detail change:", {
+      newDetail: value,
+      currentModel: selectedModel,
+      manualWidth,
+      manualHeight,
+    });
     setSelectedDetail(value);
-    if (selectedImage) {
-      const img = new Image();
-      img.onload = () => {
-        const tokenService = new ImageTokenService();
-        const result = tokenService.calculateTokens(
-          { width: img.naturalWidth, height: img.naturalHeight },
-          selectedModel,
-          value
-        );
-        setEstimatedTokens(result.tokens);
-      };
-      img.src = selectedImage;
+    if (selectedImage && imageDimensions) {
+      const tokenService = new ImageTokenService();
+      const result = tokenService.calculateTokens(
+        imageDimensions,
+        selectedModel,
+        value
+      );
+      console.log("Token calculation result (image):", result);
+      setEstimatedTokens(result.tokens);
     } else if (manualWidth && manualHeight) {
-      const width = parseInt(manualWidth);
-      const height = parseInt(manualHeight);
+      const width = Number(manualWidth);
+      const height = Number(manualHeight);
       if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
         const tokenService = new ImageTokenService();
         const result = tokenService.calculateTokens(
@@ -121,6 +136,7 @@ function App() {
           selectedModel,
           value
         );
+        console.log("Token calculation result (manual):", result);
         setEstimatedTokens(result.tokens);
       }
     }
@@ -229,13 +245,11 @@ function App() {
                     <input
                       type="number"
                       value={manualWidth}
-                      onChange={(e) => {
-                        setManualWidth(e.target.value);
-                        handleManualDimensionsChange();
-                      }}
+                      onChange={(e) => setManualWidth(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       placeholder="Enter width"
                       min="1"
+                      step="1"
                     />
                   </div>
                   <div>
@@ -245,13 +259,11 @@ function App() {
                     <input
                       type="number"
                       value={manualHeight}
-                      onChange={(e) => {
-                        setManualHeight(e.target.value);
-                        handleManualDimensionsChange();
-                      }}
+                      onChange={(e) => setManualHeight(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       placeholder="Enter height"
                       min="1"
+                      step="1"
                     />
                   </div>
                 </div>
