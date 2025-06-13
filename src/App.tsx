@@ -17,6 +17,10 @@ function App() {
   const [inputMode, setInputMode] = useState<"upload" | "manual">("upload");
   const [manualWidth, setManualWidth] = useState<string>("");
   const [manualHeight, setManualHeight] = useState<string>("");
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   const calculateTokensFromDimensions = (width: number, height: number) => {
     const tokenService = new ImageTokenService();
@@ -36,6 +40,10 @@ function App() {
         const img = new Image();
         img.onload = () => {
           setSelectedImage(e.target?.result as string);
+          setImageDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+          });
           calculateTokensFromDimensions(img.naturalWidth, img.naturalHeight);
         };
         img.src = e.target?.result as string;
@@ -245,8 +253,29 @@ function App() {
             )}
 
             {estimatedTokens !== null && (
-              <div className="text-xl font-medium bg-gray-100 dark:bg-gray-900 px-6 py-3 rounded-xl shadow-sm">
-                Estimated tokens: {estimatedTokens.toLocaleString()}
+              <div className="text-center space-y-2">
+                <div className="text-xl bg-gray-100 dark:bg-gray-900 px-6 py-3 rounded-xl shadow-sm">
+                  <span className="font-normal">Estimated tokens: </span>
+                  <span className="font-bold">
+                    {estimatedTokens.toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Calculated for {selectedModel} with {selectedDetail} detail
+                  level
+                  {selectedImage && imageDimensions ? (
+                    <span>
+                      {" "}
+                      (Image dimensions: {imageDimensions.width}×
+                      {imageDimensions.height}px)
+                    </span>
+                  ) : (
+                    <span>
+                      {" "}
+                      (Manual dimensions: {manualWidth}×{manualHeight}px)
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>
