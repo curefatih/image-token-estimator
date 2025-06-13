@@ -148,34 +148,34 @@ function App() {
         <div className="h-full flex flex-col lg:flex-row">
           {/* Main content area with image preview */}
           <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
-            <div className="w-full flex flex-col items-center gap-4 sm:gap-6">
-              <div className="w-full max-w-md mb-2 sm:mb-4">
-                <div className="flex gap-2 justify-center">
-                  <button
-                    onClick={() => setInputMode("upload")}
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
-                      inputMode === "upload"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    Upload Image
-                  </button>
-                  <button
-                    onClick={() => setInputMode("manual")}
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
-                      inputMode === "manual"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
-                    }`}
-                  >
-                    Manual Input
-                  </button>
-                </div>
+            <div className="w-full max-w-md">
+              <div className="flex gap-2 justify-center">
+                <button
+                  onClick={() => setInputMode("upload")}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
+                    inputMode === "upload"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  Upload Image
+                </button>
+                <button
+                  onClick={() => setInputMode("manual")}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${
+                    inputMode === "manual"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  Manual Input
+                </button>
               </div>
+            </div>
 
+            <div className="w-full flex-1 flex flex-col items-center gap-4 sm:gap-6 min-h-0">
               {inputMode === "upload" ? (
-                <div className="w-full min-h-[300px] max-h-[calc(100vh-24rem)] sm:max-h-[calc(100vh-20rem)] lg:max-h-[calc(100vh-16rem)] max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
+                <div className="w-full h-full max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
                   {selectedImage ? (
                     <div className="w-full h-full flex items-center justify-center p-4">
                       <img
