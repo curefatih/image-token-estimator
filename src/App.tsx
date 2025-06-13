@@ -174,9 +174,9 @@ function App() {
             </div>
 
             {inputMode === "upload" ? (
-              <div className="w-full h-full max-h-[calc(100vh-12rem)] max-w-5xl aspect-square border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group">
+              <div className="w-full h-[calc(100vh-16rem)] max-w-5xl border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
                 {selectedImage ? (
-                  <>
+                  <div className="w-full h-full flex items-center justify-center p-4">
                     <img
                       src={selectedImage}
                       alt="Preview"
@@ -212,7 +212,7 @@ function App() {
                         Change Image
                       </label>
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <div className="text-center">
                     <input
