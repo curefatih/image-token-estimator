@@ -79,14 +79,11 @@ function App() {
       };
     }
 
-    const totalTiles =
-      Math.ceil(dimensions.width / 512) * Math.ceil(dimensions.height / 512);
-    const baseTokens = config.baseTokens;
-    const tileTokens = config.tileTokens * totalTiles;
+    // For high detail, use the result from tokenService
     return {
-      base: baseTokens,
-      tile: tileTokens,
-      total: baseTokens + tileTokens,
+      base: config.baseTokens,
+      tile: result.tokens - config.baseTokens,
+      total: result.tokens,
     };
   };
 
