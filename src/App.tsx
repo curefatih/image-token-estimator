@@ -163,7 +163,7 @@ function App() {
           {/* Main content area with image preview */}
           <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
             <div className="w-full flex-1 flex flex-col items-center gap-4 sm:gap-6 min-h-0">
-              <div className="w-full h-full max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
+              <div className="w-full h-[40%] max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
                 {selectedImage ? (
                   <div className="w-full h-full flex items-center justify-center p-4">
                     <img
@@ -197,7 +197,7 @@ function App() {
               </div>
 
               {images.length > 0 && (
-                <div className="w-full overflow-x-auto">
+                <div className="w-full flex-1 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
