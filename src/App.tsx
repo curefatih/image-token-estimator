@@ -37,6 +37,10 @@ function App() {
   const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4.1");
   const [selectedDetail, setSelectedDetail] = useState<DetailLevel>("high");
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [manualDimensions, setManualDimensions] = useState({
+    width: "",
+    height: "",
+  });
 
   const selectedImage =
     images.find((img) => img.id === selectedImageId) || images[0];
@@ -157,6 +161,48 @@ function App() {
     });
   };
 
+  const handleManualDimensionsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const width = parseInt(manualDimensions.width);
+    const height = parseInt(manualDimensions.height);
+
+    if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+      return;
+    }
+
+    const dimensions = { width, height };
+    const tokens = calculateTokens(dimensions, selectedDetail);
+    const newImage = {
+      id: Math.random().toString(36).substr(2, 9),
+      src: "", // Empty src for manually added dimensions
+      dimensions,
+      tokens,
+      detail: selectedDetail,
+    };
+    setImages((prev) => [...prev, newImage]);
+    if (images.length === 0) {
+      setSelectedImageId(newImage.id);
+    }
+    setManualDimensions({ width: "", height: "" });
+  };
+
+  const PlaceholderImage = ({
+    width,
+    height,
+  }: {
+    width: number;
+    height: number;
+  }) => (
+    <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl">
+      <div className="text-center p-4">
+        <div className="text-4xl mb-2">📐</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {width} × {height}px
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6 lg:p-8 overflow-hidden">
       <div className="h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border-2 sm:border-4 border-gray-200 dark:border-gray-700">
@@ -167,11 +213,18 @@ function App() {
               <div className="w-full h-[40%] max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
                 {selectedImage ? (
                   <div className="w-full h-full flex items-center justify-center p-4">
-                    <img
-                      src={selectedImage.src}
-                      alt="Preview"
-                      className="max-w-full max-h-full object-contain rounded-xl"
-                    />
+                    {selectedImage.src ? (
+                      <img
+                        src={selectedImage.src}
+                        alt="Preview"
+                        className="max-w-full max-h-full object-contain rounded-xl"
+                      />
+                    ) : (
+                      <PlaceholderImage
+                        width={selectedImage.dimensions.width}
+                        height={selectedImage.dimensions.height}
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="text-center">
@@ -223,11 +276,23 @@ function App() {
                           onClick={() => setSelectedImageId(image.id)}
                         >
                           <TableCell>
-                            <img
-                              src={image.src}
-                              alt="Preview"
-                              className="w-16 h-16 object-cover rounded"
-                            />
+                            {image.src ? (
+                              <img
+                                src={image.src}
+                                alt="Preview"
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+                                <div className="text-center">
+                                  <div className="text-lg">📐</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    {image.dimensions.width}×
+                                    {image.dimensions.height}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell>
                             {image.dimensions.width}×{image.dimensions.height}px
@@ -372,6 +437,50 @@ function App() {
                       <SelectItem value="high">High</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
+                    Manual Dimensions
+                  </label>
+                  <form
+                    onSubmit={handleManualDimensionsSubmit}
+                    className="space-y-2"
+                  >
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Width"
+                        value={manualDimensions.width}
+                        onChange={(e) =>
+                          setManualDimensions((prev) => ({
+                            ...prev,
+                            width: e.target.value,
+                          }))
+                        }
+                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                        min="1"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Height"
+                        value={manualDimensions.height}
+                        onChange={(e) =>
+                          setManualDimensions((prev) => ({
+                            ...prev,
+                            height: e.target.value,
+                          }))
+                        }
+                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                        min="1"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+                    >
+                      Add Dimensions
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
