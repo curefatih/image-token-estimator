@@ -584,12 +584,14 @@ function App() {
             </div>
             <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="space-y-4">
-                <button
-                  onClick={triggerFileInput}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
-                >
-                  Add More Images
-                </button>
+                {images.length > 0 && (
+                  <button
+                    onClick={triggerFileInput}
+                    className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+                  >
+                    Add More Images
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setImages([]);
