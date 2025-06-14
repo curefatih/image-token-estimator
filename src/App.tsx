@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ImageTokenService } from "@/lib/image-token-service";
+import { ModelPricingService } from "@/lib/model-pricing-service";
 import type { ModelType, DetailLevel } from "@/lib/types";
 
 interface ImageData {
@@ -41,6 +42,11 @@ function App() {
     width: "",
     height: "",
   });
+  const [pricingService] = useState(() => new ModelPricingService());
+
+  useEffect(() => {
+    pricingService.initialize();
+  }, [pricingService]);
 
   const selectedImage =
     images.find((img) => img.id === selectedImageId) || images[0];
@@ -186,6 +192,10 @@ function App() {
     setManualDimensions({ width: "", height: "" });
   };
 
+  const calculateCost = (tokens: number) => {
+    return pricingService.calculateCost(selectedModel, tokens);
+  };
+
   const PlaceholderImage = ({
     width,
     height,
@@ -261,6 +271,7 @@ function App() {
                         <TableHead>Base Tokens</TableHead>
                         <TableHead>Tile Tokens</TableHead>
                         <TableHead>Total Tokens</TableHead>
+                        <TableHead>Cost</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -320,13 +331,34 @@ function App() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {Math.ceil(image.tokens.base).toLocaleString()}
+                            <div className="text-right">
+                              <div className="font-medium">
+                                {Math.ceil(image.tokens.base).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                ${calculateCost(image.tokens.base).toFixed(6)}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell>
-                            {Math.ceil(image.tokens.tile).toLocaleString()}
+                            <div className="text-right">
+                              <div className="font-medium">
+                                {Math.ceil(image.tokens.tile).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                ${calculateCost(image.tokens.tile).toFixed(6)}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell>
-                            {Math.ceil(image.tokens.total).toLocaleString()}
+                            <div className="text-right">
+                              <div className="font-medium">
+                                {Math.ceil(image.tokens.total).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                ${calculateCost(image.tokens.total).toFixed(6)}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell>
                             <button
@@ -353,30 +385,72 @@ function App() {
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Base Tokens
                       </div>
-                      <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {Math.ceil(
-                          images.reduce((sum, img) => sum + img.tokens.base, 0)
-                        ).toLocaleString()}
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">
+                          {Math.ceil(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.base,
+                              0
+                            )
+                          ).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          $
+                          {calculateCost(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.base,
+                              0
+                            )
+                          ).toFixed(6)}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tile Tokens
                       </div>
-                      <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {Math.ceil(
-                          images.reduce((sum, img) => sum + img.tokens.tile, 0)
-                        ).toLocaleString()}
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">
+                          {Math.ceil(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.tile,
+                              0
+                            )
+                          ).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          $
+                          {calculateCost(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.tile,
+                              0
+                            )
+                          ).toFixed(6)}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Total Tokens
                       </div>
-                      <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {Math.ceil(
-                          images.reduce((sum, img) => sum + img.tokens.total, 0)
-                        ).toLocaleString()}
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900 dark:text-white">
+                          {Math.ceil(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.total,
+                              0
+                            )
+                          ).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          $
+                          {calculateCost(
+                            images.reduce(
+                              (sum, img) => sum + img.tokens.total,
+                              0
+                            )
+                          ).toFixed(6)}
+                        </div>
                       </div>
                     </div>
                   </div>
