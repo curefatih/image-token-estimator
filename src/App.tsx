@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Select,
   SelectContent,
@@ -44,6 +44,7 @@ function App() {
     height: "",
   });
   const [pricingService] = useState(() => new ModelPricingService());
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     pricingService.initialize();
@@ -118,6 +119,14 @@ function App() {
         };
         reader.readAsDataURL(file);
       });
+      // Reset the input value so the same file can be selected again
+      event.target.value = "";
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -215,6 +224,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto lg:overflow-hidden">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+        multiple
+      />
       <div className="h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-auto lg:overflow-hidden border-2 sm:border-4 border-gray-200 dark:border-gray-700">
         <div className="h-full flex flex-col lg:flex-row">
           {/* Main content area with image preview */}
@@ -238,16 +255,8 @@ function App() {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="image-upload"
-                      multiple
-                    />
                     <label
-                      htmlFor="image-upload"
+                      onClick={triggerFileInput}
                       className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
                     >
                       <div className="text-5xl mb-3">📁</div>
@@ -574,15 +583,23 @@ function App() {
               </div>
             </div>
             <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => {
-                  setImages([]);
-                  setSelectedImageId(null);
-                }}
-                className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors mb-4"
-              >
-                Clear All Images
-              </button>
+              <div className="space-y-4">
+                <button
+                  onClick={triggerFileInput}
+                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+                >
+                  Add More Images
+                </button>
+                <button
+                  onClick={() => {
+                    setImages([]);
+                    setSelectedImageId(null);
+                  }}
+                  className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
+                >
+                  Clear All Images
+                </button>
+              </div>
               <Disclaimer />
             </div>
           </div>
