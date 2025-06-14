@@ -12,6 +12,21 @@ export type ModelType =
 
 export type DetailLevel = "low" | "high";
 
+export interface ImageData {
+  id: string;
+  src: string;
+  dimensions: {
+    width: number;
+    height: number;
+  };
+  tokens: {
+    base: number;
+    tile: number;
+    total: number;
+  };
+  detail: DetailLevel;
+}
+
 export interface ImageDimensions {
   width: number;
   height: number;
