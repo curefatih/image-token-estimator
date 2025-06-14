@@ -13,7 +13,7 @@ export class ImageTokenService {
   private static readonly HIGH_DETAIL_MIN_SIZE = 768;
   private static readonly HIGH_DETAIL_TILE_SIZE = 512;
 
-  private static readonly MODEL_CONFIGS: Record<ModelType, ModelConfig> = {
+  public static readonly MODEL_CONFIGS: Record<ModelType, ModelConfig> = {
     "gpt-4.1-mini": { baseTokens: 0, tileTokens: 0, multiplier: 1.62 },
     "gpt-4.1-nano": { baseTokens: 0, tileTokens: 0, multiplier: 2.46 },
     "o4-mini": { baseTokens: 0, tileTokens: 0, multiplier: 1.72 },
@@ -25,6 +25,10 @@ export class ImageTokenService {
     o3: { baseTokens: 75, tileTokens: 150 },
     cua: { baseTokens: 65, tileTokens: 129 },
   };
+
+  public getModelConfig(model: ModelType): ModelConfig {
+    return ImageTokenService.MODEL_CONFIGS[model];
+  }
 
   public calculateTokens(
     dimensions: ImageDimensions,

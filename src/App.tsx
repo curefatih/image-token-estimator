@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -6,141 +6,122 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ImageTokenService } from "@/lib/image-token-service";
 import type { ModelType, DetailLevel } from "@/lib/types";
 
-function App() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4.1");
-  const [selectedDetail, setSelectedDetail] = useState<DetailLevel>("high");
-  const [estimatedTokens, setEstimatedTokens] = useState<number | null>(null);
-  const [manualWidth, setManualWidth] = useState<string>("");
-  const [manualHeight, setManualHeight] = useState<string>("");
-  const [imageDimensions, setImageDimensions] = useState<{
+interface ImageData {
+  id: string;
+  src: string;
+  dimensions: {
     width: number;
     height: number;
-  } | null>(null);
+  };
+  tokens: {
+    base: number;
+    tile: number;
+    total: number;
+  };
+}
 
-  useEffect(() => {
-    if (manualWidth && manualHeight) {
-      const width = Number(manualWidth);
-      const height = Number(manualHeight);
-      console.log("Raw input values:", { manualWidth, manualHeight });
-      console.log("Parsed values:", { width, height });
-      if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-        console.log("Manual dimensions change:", {
-          width,
-          height,
-          model: selectedModel,
-          detail: selectedDetail,
-        });
-        const tokenService = new ImageTokenService();
-        const result = tokenService.calculateTokens(
-          { width, height },
-          selectedModel,
-          selectedDetail
-        );
-        console.log("Token calculation result:", result);
-        setEstimatedTokens(result.tokens);
-      } else {
-        setEstimatedTokens(null);
-      }
+function App() {
+  const [images, setImages] = useState<ImageData[]>([]);
+  const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4.1");
+  const [selectedDetail, setSelectedDetail] = useState<DetailLevel>("high");
+
+  const calculateTokens = (dimensions: { width: number; height: number }) => {
+    const tokenService = new ImageTokenService();
+    const result = tokenService.calculateTokens(
+      dimensions,
+      selectedModel,
+      selectedDetail
+    );
+    const config = tokenService.getModelConfig(selectedModel);
+
+    if (config.multiplier) {
+      return {
+        base: 0,
+        tile: result.tokens,
+        total: result.tokens,
+      };
     }
-  }, [manualWidth, manualHeight, selectedModel, selectedDetail]);
+
+    if (selectedDetail === "low") {
+      return {
+        base: result.tokens,
+        tile: 0,
+        total: result.tokens,
+      };
+    }
+
+    const totalTiles =
+      Math.ceil(dimensions.width / 512) * Math.ceil(dimensions.height / 512);
+    return {
+      base: config.baseTokens,
+      tile: config.tileTokens * totalTiles,
+      total: result.tokens,
+    };
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          setSelectedImage(e.target?.result as string);
-          const dimensions = {
-            width: img.naturalWidth,
-            height: img.naturalHeight,
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const dimensions = {
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            };
+            const tokens = calculateTokens(dimensions);
+            setImages((prev) => [
+              ...prev,
+              {
+                id: Math.random().toString(36).substr(2, 9),
+                src: e.target?.result as string,
+                dimensions,
+                tokens,
+              },
+            ]);
           };
-          setImageDimensions(dimensions);
-          setManualWidth("");
-          setManualHeight("");
-          const tokenService = new ImageTokenService();
-          const result = tokenService.calculateTokens(
-            dimensions,
-            selectedModel,
-            selectedDetail
-          );
-          setEstimatedTokens(result.tokens);
+          img.src = e.target?.result as string;
         };
-        img.src = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      });
     }
   };
 
   const handleModelChange = (value: ModelType) => {
-    console.log("Model change:", {
-      newModel: value,
-      currentDetail: selectedDetail,
-      manualWidth,
-      manualHeight,
-    });
     setSelectedModel(value);
-    if (selectedImage && imageDimensions) {
-      const tokenService = new ImageTokenService();
-      const result = tokenService.calculateTokens(
-        imageDimensions,
-        value,
-        selectedDetail
-      );
-      console.log("Token calculation result (image):", result);
-      setEstimatedTokens(result.tokens);
-    } else if (manualWidth && manualHeight) {
-      const width = Number(manualWidth);
-      const height = Number(manualHeight);
-      if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-        const tokenService = new ImageTokenService();
-        const result = tokenService.calculateTokens(
-          { width, height },
-          value,
-          selectedDetail
-        );
-        console.log("Token calculation result (manual):", result);
-        setEstimatedTokens(result.tokens);
-      }
-    }
+    setImages((prev) =>
+      prev.map((img) => ({
+        ...img,
+        tokens: calculateTokens(img.dimensions),
+      }))
+    );
   };
 
   const handleDetailChange = (value: DetailLevel) => {
-    console.log("Detail change:", {
-      newDetail: value,
-      currentModel: selectedModel,
-      manualWidth,
-      manualHeight,
-    });
     setSelectedDetail(value);
-    if (selectedImage && imageDimensions) {
-      const tokenService = new ImageTokenService();
-      const result = tokenService.calculateTokens(
-        imageDimensions,
-        selectedModel,
-        value
-      );
-      console.log("Token calculation result (image):", result);
-      setEstimatedTokens(result.tokens);
-    } else if (manualWidth && manualHeight) {
-      const width = Number(manualWidth);
-      const height = Number(manualHeight);
-      if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
-        const tokenService = new ImageTokenService();
-        const result = tokenService.calculateTokens(
-          { width, height },
-          selectedModel,
-          value
-        );
-        console.log("Token calculation result (manual):", result);
-        setEstimatedTokens(result.tokens);
-      }
-    }
+    setImages((prev) =>
+      prev.map((img) => ({
+        ...img,
+        tokens: calculateTokens(img.dimensions),
+      }))
+    );
+  };
+
+  const removeImage = (id: string) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   return (
@@ -151,94 +132,72 @@ function App() {
           <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
             <div className="w-full flex-1 flex flex-col items-center gap-4 sm:gap-6 min-h-0">
               <div className="w-full h-full max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
-                {selectedImage ? (
-                  <div className="w-full h-full flex items-center justify-center p-4">
-                    <img
-                      src={selectedImage}
-                      alt="Preview"
-                      className="max-w-full max-h-full object-contain rounded-xl"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex items-center justify-center">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        id="image-upload"
-                      />
-                      <label
-                        htmlFor="image-upload"
-                        className="cursor-pointer bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="17 8 12 3 7 8" />
-                          <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        Change Image
-                      </label>
+                <div className="text-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                    multiple
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
+                  >
+                    <div className="text-5xl mb-3">📁</div>
+                    <div className="text-lg">Click to upload images</div>
+                    <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                      Supports JPG, PNG, GIF
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
-                    >
-                      <div className="text-5xl mb-3">📁</div>
-                      <div className="text-lg">Click to upload an image</div>
-                      <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                        Supports JPG, PNG, GIF
-                      </div>
-                    </label>
-                  </div>
-                )}
+                  </label>
+                </div>
               </div>
-            </div>
 
-            {estimatedTokens !== null && (
-              <div className="w-full text-center space-y-2 px-2 sm:px-0 mt-auto">
-                <div className="text-lg sm:text-xl bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-sm">
-                  <span className="font-normal">Estimated tokens: </span>
-                  <span className="font-bold">
-                    {Math.ceil(estimatedTokens).toLocaleString()}
-                  </span>
+              {images.length > 0 && (
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Dimensions</TableHead>
+                        <TableHead>Base Tokens</TableHead>
+                        <TableHead>Tile Tokens</TableHead>
+                        <TableHead>Total Tokens</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {images.map((image) => (
+                        <TableRow key={image.id}>
+                          <TableCell>
+                            <img
+                              src={image.src}
+                              alt="Preview"
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {image.dimensions.width}×{image.dimensions.height}px
+                          </TableCell>
+                          <TableCell>{image.tokens.base}</TableCell>
+                          <TableCell>{image.tokens.tile}</TableCell>
+                          <TableCell>{image.tokens.total}</TableCell>
+                          <TableCell>
+                            <button
+                              onClick={() => removeImage(image.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              Remove
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-                <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                  Calculated for {selectedModel} with {selectedDetail} detail
-                  level
-                  {selectedImage && imageDimensions ? (
-                    <span>
-                      {" "}
-                      (Image dimensions: {imageDimensions.width}×
-                      {imageDimensions.height}px)
-                    </span>
-                  ) : (
-                    <span>
-                      {" "}
-                      (Manual dimensions: {manualWidth}×{manualHeight}px)
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Right panel with options */}
@@ -289,41 +248,6 @@ function App() {
                       <SelectItem value="high">High</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
-                    Manual Dimensions
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-gray-600 dark:text-gray-400">
-                        Width (px)
-                      </label>
-                      <input
-                        type="number"
-                        value={manualWidth}
-                        onChange={(e) => setManualWidth(e.target.value)}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                        placeholder="Width"
-                        min="1"
-                        step="1"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-gray-600 dark:text-gray-400">
-                        Height (px)
-                      </label>
-                      <input
-                        type="number"
-                        value={manualHeight}
-                        onChange={(e) => setManualHeight(e.target.value)}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                        placeholder="Height"
-                        min="1"
-                        step="1"
-                      />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
