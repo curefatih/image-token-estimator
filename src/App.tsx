@@ -517,7 +517,7 @@ function App() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
                     Manual Dimensions
                   </label>
