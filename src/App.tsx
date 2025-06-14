@@ -446,7 +446,7 @@ function App() {
                     onSubmit={handleManualDimensionsSubmit}
                     className="space-y-2"
                   >
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <input
                         type="number"
                         placeholder="Width"
@@ -457,7 +457,7 @@ function App() {
                             width: e.target.value,
                           }))
                         }
-                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
                         min="1"
                       />
                       <input
@@ -470,7 +470,7 @@ function App() {
                             height: e.target.value,
                           }))
                         }
-                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                        className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
                         min="1"
                       />
                     </div>
