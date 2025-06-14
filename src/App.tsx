@@ -485,6 +485,15 @@ function App() {
               </div>
             </div>
             <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => {
+                  setImages([]);
+                  setSelectedImageId(null);
+                }}
+                className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors mb-4"
+              >
+                Clear All Images
+              </button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 These estimates are based on{" "}
                 <a
