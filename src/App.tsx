@@ -214,11 +214,11 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6 lg:p-8 overflow-hidden">
-      <div className="h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border-2 sm:border-4 border-gray-200 dark:border-gray-700">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto lg:overflow-hidden">
+      <div className="h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] md:h-[calc(100vh-3rem)] lg:h-[calc(100vh-4rem)] max-w-[1920px] mx-auto bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-auto lg:overflow-hidden border-2 sm:border-4 border-gray-200 dark:border-gray-700">
         <div className="h-full flex flex-col lg:flex-row">
           {/* Main content area with image preview */}
-          <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
+          <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 lg:overflow-y-auto">
             <div className="w-full flex-1 flex flex-col items-center gap-4 sm:gap-6 min-h-0">
               <div className="w-full h-[40%] max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
                 {selectedImage ? (
@@ -261,125 +261,135 @@ function App() {
               </div>
 
               {images.length > 0 && (
-                <div className="w-full flex-1 overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Dimensions</TableHead>
-                        <TableHead>Detail Level</TableHead>
-                        <TableHead className="text-right">
-                          Base Tokens
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Tile Tokens
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Total Tokens
-                        </TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {images.map((image) => (
-                        <TableRow
-                          key={image.id}
-                          className={`cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                            image.id === selectedImageId
-                              ? "bg-gray-100 dark:bg-gray-800"
-                              : ""
-                          }`}
-                          onClick={() => setSelectedImageId(image.id)}
-                        >
-                          <TableCell>
-                            {image.src ? (
-                              <img
-                                src={image.src}
-                                alt="Preview"
-                                className="w-16 h-16 object-cover rounded"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
-                                <div className="text-center">
-                                  <div className="text-lg">📐</div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                                    {image.dimensions.width}×
-                                    {image.dimensions.height}
+                <div className="w-full flex-1">
+                  <div className="w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Image</TableHead>
+                          <TableHead>Dimensions</TableHead>
+                          <TableHead>Detail Level</TableHead>
+                          <TableHead className="text-right">
+                            Base Tokens
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Tile Tokens
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Total Tokens
+                          </TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {images.map((image) => (
+                          <TableRow
+                            key={image.id}
+                            className={`cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                              image.id === selectedImageId
+                                ? "bg-gray-100 dark:bg-gray-800"
+                                : ""
+                            }`}
+                            onClick={() => setSelectedImageId(image.id)}
+                          >
+                            <TableCell>
+                              {image.src ? (
+                                <img
+                                  src={image.src}
+                                  alt="Preview"
+                                  className="w-16 h-16 object-cover rounded"
+                                />
+                              ) : (
+                                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+                                  <div className="text-center">
+                                    <div className="text-lg">📐</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                      {image.dimensions.width}×
+                                      {image.dimensions.height}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {image.dimensions.width}×{image.dimensions.height}px
-                          </TableCell>
-                          <TableCell>
-                            <div
-                              onClick={(e: React.MouseEvent) =>
-                                e.stopPropagation()
-                              }
-                            >
-                              <Select
-                                value={image.detail}
-                                onValueChange={(value: DetailLevel) =>
-                                  handleImageDetailChange(image.id, value)
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {image.dimensions.width}×{image.dimensions.height}
+                              px
+                            </TableCell>
+                            <TableCell>
+                              <div
+                                onClick={(e: React.MouseEvent) =>
+                                  e.stopPropagation()
                                 }
                               >
-                                <SelectTrigger className="w-[100px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="low">Low</SelectItem>
-                                  <SelectItem value="high">High</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div>
-                              <div className="font-medium">
-                                {Math.ceil(image.tokens.base).toLocaleString()}
+                                <Select
+                                  value={image.detail}
+                                  onValueChange={(value: DetailLevel) =>
+                                    handleImageDetailChange(image.id, value)
+                                  }
+                                >
+                                  <SelectTrigger className="w-[100px]">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="low">Low</SelectItem>
+                                    <SelectItem value="high">High</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
-                                ${calculateCost(image.tokens.base).toFixed(6)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div>
+                                <div className="font-medium">
+                                  {Math.ceil(
+                                    image.tokens.base
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  ${calculateCost(image.tokens.base).toFixed(6)}
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div>
-                              <div className="font-medium">
-                                {Math.ceil(image.tokens.tile).toLocaleString()}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div>
+                                <div className="font-medium">
+                                  {Math.ceil(
+                                    image.tokens.tile
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  ${calculateCost(image.tokens.tile).toFixed(6)}
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
-                                ${calculateCost(image.tokens.tile).toFixed(6)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div>
+                                <div className="font-medium">
+                                  {Math.ceil(
+                                    image.tokens.total
+                                  ).toLocaleString()}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  $
+                                  {calculateCost(image.tokens.total).toFixed(6)}
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div>
-                              <div className="font-medium">
-                                {Math.ceil(image.tokens.total).toLocaleString()}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
-                                ${calculateCost(image.tokens.total).toFixed(6)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeImage(image.id);
-                              }}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              Remove
-                            </button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                            </TableCell>
+                            <TableCell>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeImage(image.id);
+                                }}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                Remove
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               )}
 
@@ -469,8 +479,8 @@ function App() {
           </div>
 
           {/* Right panel with options */}
-          <div className="w-full lg:w-80 xl:w-96 border-t-2 lg:border-t-0 lg:border-l-2 sm:border-t-4 sm:border-l-4 border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6 lg:gap-8 bg-gray-50 dark:bg-gray-900/50">
-            <div>
+          <div className="w-full lg:w-80 xl:w-96 border-t-2 lg:border-t-0 lg:border-l-2 sm:border-t-4 sm:border-l-4 border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-4 sm:gap-6 lg:gap-8 bg-gray-50 dark:bg-gray-900/50 lg:overflow-y-auto">
+            <div className="flex flex-col flex-1 min-h-0">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                 Options
               </h2>
