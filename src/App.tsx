@@ -36,6 +36,10 @@ function App() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4.1");
   const [selectedDetail, setSelectedDetail] = useState<DetailLevel>("high");
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+
+  const selectedImage =
+    images.find((img) => img.id === selectedImageId) || images[0];
 
   const calculateTokens = (
     dimensions: { width: number; height: number },
@@ -87,16 +91,18 @@ function App() {
               height: img.naturalHeight,
             };
             const tokens = calculateTokens(dimensions, selectedDetail);
-            setImages((prev) => [
-              ...prev,
-              {
-                id: Math.random().toString(36).substr(2, 9),
-                src: e.target?.result as string,
-                dimensions,
-                tokens,
-                detail: selectedDetail,
-              },
-            ]);
+            const newImage = {
+              id: Math.random().toString(36).substr(2, 9),
+              src: e.target?.result as string,
+              dimensions,
+              tokens,
+              detail: selectedDetail,
+            };
+            setImages((prev) => [...prev, newImage]);
+            // Set as selected image if it's the first one
+            if (images.length === 0) {
+              setSelectedImageId(newImage.id);
+            }
           };
           img.src = e.target?.result as string;
         };
@@ -140,7 +146,14 @@ function App() {
   };
 
   const removeImage = (id: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== id));
+    setImages((prev) => {
+      const newImages = prev.filter((img) => img.id !== id);
+      // If we removed the selected image, select the first remaining one
+      if (id === selectedImageId) {
+        setSelectedImageId(newImages[0]?.id || null);
+      }
+      return newImages;
+    });
   };
 
   return (
@@ -151,26 +164,36 @@ function App() {
           <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-between gap-4 sm:gap-6 overflow-y-auto">
             <div className="w-full flex-1 flex flex-col items-center gap-4 sm:gap-6 min-h-0">
               <div className="w-full h-full max-w-5xl border-2 sm:border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-900/50 transition-all duration-300 hover:border-gray-400 dark:hover:border-gray-500 relative group overflow-hidden">
-                <div className="text-center">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                    multiple
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
-                  >
-                    <div className="text-5xl mb-3">📁</div>
-                    <div className="text-lg">Click to upload images</div>
-                    <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                      Supports JPG, PNG, GIF
-                    </div>
-                  </label>
-                </div>
+                {selectedImage ? (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <img
+                      src={selectedImage.src}
+                      alt="Preview"
+                      className="max-w-full max-h-full object-contain rounded-xl"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                      multiple
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
+                    >
+                      <div className="text-5xl mb-3">📁</div>
+                      <div className="text-lg">Click to upload images</div>
+                      <div className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                        Supports JPG, PNG, GIF
+                      </div>
+                    </label>
+                  </div>
+                )}
               </div>
 
               {images.length > 0 && (
@@ -189,7 +212,15 @@ function App() {
                     </TableHeader>
                     <TableBody>
                       {images.map((image) => (
-                        <TableRow key={image.id}>
+                        <TableRow
+                          key={image.id}
+                          className={`cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                            image.id === selectedImageId
+                              ? "bg-gray-100 dark:bg-gray-800"
+                              : ""
+                          }`}
+                          onClick={() => setSelectedImageId(image.id)}
+                        >
                           <TableCell>
                             <img
                               src={image.src}
@@ -201,27 +232,36 @@ function App() {
                             {image.dimensions.width}×{image.dimensions.height}px
                           </TableCell>
                           <TableCell>
-                            <Select
-                              value={image.detail}
-                              onValueChange={(value: DetailLevel) =>
-                                handleImageDetailChange(image.id, value)
+                            <div
+                              onClick={(e: React.MouseEvent) =>
+                                e.stopPropagation()
                               }
                             >
-                              <SelectTrigger className="w-[100px]">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="low">Low</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
-                              </SelectContent>
-                            </Select>
+                              <Select
+                                value={image.detail}
+                                onValueChange={(value: DetailLevel) =>
+                                  handleImageDetailChange(image.id, value)
+                                }
+                              >
+                                <SelectTrigger className="w-[100px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="low">Low</SelectItem>
+                                  <SelectItem value="high">High</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </TableCell>
                           <TableCell>{image.tokens.base}</TableCell>
                           <TableCell>{image.tokens.tile}</TableCell>
                           <TableCell>{image.tokens.total}</TableCell>
                           <TableCell>
                             <button
-                              onClick={() => removeImage(image.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeImage(image.id);
+                              }}
                               className="text-red-500 hover:text-red-700"
                             >
                               Remove
