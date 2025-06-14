@@ -126,7 +126,8 @@ function App() {
     setImages((prev) =>
       prev.map((img) => ({
         ...img,
-        tokens: calculateTokens(img.dimensions, img.detail),
+        detail: value,
+        tokens: calculateTokens(img.dimensions, value),
       }))
     );
   };
@@ -253,9 +254,15 @@ function App() {
                               </Select>
                             </div>
                           </TableCell>
-                          <TableCell>{image.tokens.base}</TableCell>
-                          <TableCell>{image.tokens.tile}</TableCell>
-                          <TableCell>{image.tokens.total}</TableCell>
+                          <TableCell>
+                            {Math.ceil(image.tokens.base).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {Math.ceil(image.tokens.tile).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {Math.ceil(image.tokens.total).toLocaleString()}
+                          </TableCell>
                           <TableCell>
                             <button
                               onClick={(e) => {
@@ -271,6 +278,47 @@ function App() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+
+              {images.length > 0 && (
+                <div className="w-full mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Base Tokens
+                      </div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {Math.ceil(
+                          images.reduce((sum, img) => sum + img.tokens.base, 0)
+                        ).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tile Tokens
+                      </div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {Math.ceil(
+                          images.reduce((sum, img) => sum + img.tokens.tile, 0)
+                        ).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Total Tokens
+                      </div>
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {Math.ceil(
+                          images.reduce((sum, img) => sum + img.tokens.total, 0)
+                        ).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+                    {images.length} image{images.length > 1 ? "s" : ""} •{" "}
+                    {selectedModel}
+                  </div>
                 </div>
               )}
             </div>
