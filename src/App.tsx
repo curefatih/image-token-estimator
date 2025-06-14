@@ -81,10 +81,12 @@ function App() {
 
     const totalTiles =
       Math.ceil(dimensions.width / 512) * Math.ceil(dimensions.height / 512);
+    const baseTokens = config.baseTokens;
+    const tileTokens = config.tileTokens * totalTiles;
     return {
-      base: config.baseTokens,
-      tile: config.tileTokens * totalTiles,
-      total: result.tokens,
+      base: baseTokens,
+      tile: tileTokens,
+      total: baseTokens + tileTokens,
     };
   };
 
@@ -268,10 +270,15 @@ function App() {
                         <TableHead>Image</TableHead>
                         <TableHead>Dimensions</TableHead>
                         <TableHead>Detail Level</TableHead>
-                        <TableHead>Base Tokens</TableHead>
-                        <TableHead>Tile Tokens</TableHead>
-                        <TableHead>Total Tokens</TableHead>
-                        <TableHead>Cost</TableHead>
+                        <TableHead className="text-right">
+                          Base Tokens
+                        </TableHead>
+                        <TableHead className="text-right">
+                          Tile Tokens
+                        </TableHead>
+                        <TableHead className="text-right">
+                          Total Tokens
+                        </TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -330,8 +337,8 @@ function App() {
                               </Select>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="text-right">
+                          <TableCell className="text-right">
+                            <div>
                               <div className="font-medium">
                                 {Math.ceil(image.tokens.base).toLocaleString()}
                               </div>
@@ -340,8 +347,8 @@ function App() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="text-right">
+                          <TableCell className="text-right">
+                            <div>
                               <div className="font-medium">
                                 {Math.ceil(image.tokens.tile).toLocaleString()}
                               </div>
@@ -350,8 +357,8 @@ function App() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="text-right">
+                          <TableCell className="text-right">
+                            <div>
                               <div className="font-medium">
                                 {Math.ceil(image.tokens.total).toLocaleString()}
                               </div>
