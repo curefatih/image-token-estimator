@@ -29,6 +29,7 @@ interface ImageData {
     tile: number;
     total: number;
   };
+  detail: DetailLevel;
 }
 
 function App() {
@@ -36,12 +37,15 @@ function App() {
   const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4.1");
   const [selectedDetail, setSelectedDetail] = useState<DetailLevel>("high");
 
-  const calculateTokens = (dimensions: { width: number; height: number }) => {
+  const calculateTokens = (
+    dimensions: { width: number; height: number },
+    detail: DetailLevel
+  ) => {
     const tokenService = new ImageTokenService();
     const result = tokenService.calculateTokens(
       dimensions,
       selectedModel,
-      selectedDetail
+      detail
     );
     const config = tokenService.getModelConfig(selectedModel);
 
@@ -53,7 +57,7 @@ function App() {
       };
     }
 
-    if (selectedDetail === "low") {
+    if (detail === "low") {
       return {
         base: result.tokens,
         tile: 0,
@@ -82,7 +86,7 @@ function App() {
               width: img.naturalWidth,
               height: img.naturalHeight,
             };
-            const tokens = calculateTokens(dimensions);
+            const tokens = calculateTokens(dimensions, selectedDetail);
             setImages((prev) => [
               ...prev,
               {
@@ -90,6 +94,7 @@ function App() {
                 src: e.target?.result as string,
                 dimensions,
                 tokens,
+                detail: selectedDetail,
               },
             ]);
           };
@@ -105,7 +110,7 @@ function App() {
     setImages((prev) =>
       prev.map((img) => ({
         ...img,
-        tokens: calculateTokens(img.dimensions),
+        tokens: calculateTokens(img.dimensions, img.detail),
       }))
     );
   };
@@ -115,8 +120,22 @@ function App() {
     setImages((prev) =>
       prev.map((img) => ({
         ...img,
-        tokens: calculateTokens(img.dimensions),
+        tokens: calculateTokens(img.dimensions, img.detail),
       }))
+    );
+  };
+
+  const handleImageDetailChange = (id: string, value: DetailLevel) => {
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id
+          ? {
+              ...img,
+              detail: value,
+              tokens: calculateTokens(img.dimensions, value),
+            }
+          : img
+      )
     );
   };
 
@@ -161,6 +180,7 @@ function App() {
                       <TableRow>
                         <TableHead>Image</TableHead>
                         <TableHead>Dimensions</TableHead>
+                        <TableHead>Detail Level</TableHead>
                         <TableHead>Base Tokens</TableHead>
                         <TableHead>Tile Tokens</TableHead>
                         <TableHead>Total Tokens</TableHead>
@@ -179,6 +199,22 @@ function App() {
                           </TableCell>
                           <TableCell>
                             {image.dimensions.width}×{image.dimensions.height}px
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={image.detail}
+                              onValueChange={(value: DetailLevel) =>
+                                handleImageDetailChange(image.id, value)
+                              }
+                            >
+                              <SelectTrigger className="w-[100px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="high">High</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>{image.tokens.base}</TableCell>
                           <TableCell>{image.tokens.tile}</TableCell>
@@ -234,7 +270,7 @@ function App() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1 sm:mb-2 text-gray-700 dark:text-gray-300">
-                    Detail Level
+                    Default Detail Level
                   </label>
                   <Select
                     value={selectedDetail}
